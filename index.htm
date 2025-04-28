@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembrook Space</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -41,12 +43,8 @@
     </script>
     <style>
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -97,7 +95,6 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
-        <!-- Header -->
         <header class="mb-8">
             <div>
                 <h1 class="text-3xl font-bold text-primary-600 dark:text-primary-400">Pembrook Space</h1>
@@ -118,9 +115,7 @@
             </div>
         </header>
 
-        <!-- Status Cards - Vertical Layout -->
         <div class="space-y-6 mb-8">
-            <!-- Laundry - Washer -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div class="bg-primary-500 dark:bg-primary-700 p-4">
                     <h2 class="text-xl font-semibold text-white flex items-center">
@@ -138,9 +133,9 @@
                         <div class="text-5xl mb-4">
                             <i class="fas fa-user-clock text-yellow-500"></i>
                         </div>
-                        <p class="text-xl font-medium" id="washerUserName">John Doe</p>
-                        <p class="text-gray-600 dark:text-gray-400" id="washerUserDetails">House #12, Room 3</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="washerTime">10:30 AM</span></p>
+                        <p class="text-xl font-medium" id="washerUserName"></p>
+                        <p class="text-gray-600 dark:text-gray-400" id="washerUserDetails"></p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="washerTime"></span></p>
                     </div>
                     <button id="washerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
                         Mark as In Use
@@ -151,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- Laundry - Dryer -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div class="bg-primary-500 dark:bg-primary-700 p-4">
                     <h2 class="text-xl font-semibold text-white flex items-center">
@@ -169,9 +163,9 @@
                         <div class="text-5xl mb-4">
                             <i class="fas fa-user-clock text-yellow-500"></i>
                         </div>
-                        <p class="text-xl font-medium" id="dryerUserName">John Doe</p>
-                        <p class="text-gray-600 dark:text-gray-400" id="dryerUserDetails">House #12, Room 3</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="dryerTime">10:30 AM</span></p>
+                        <p class="text-xl font-medium" id="dryerUserName"></p>
+                        <p class="text-gray-600 dark:text-gray-400" id="dryerUserDetails"></p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="dryerTime"></span></p>
                     </div>
                     <button id="dryerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
                         Mark as In Use
@@ -182,7 +176,6 @@
                 </div>
             </div>
 
-            <!-- Kitchen -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div class="bg-primary-500 dark:bg-primary-700 p-4">
                     <h2 class="text-xl font-semibold text-white flex items-center">
@@ -200,9 +193,9 @@
                         <div class="text-5xl mb-4">
                             <i class="fas fa-user-clock text-yellow-500"></i>
                         </div>
-                        <p class="text-xl font-medium" id="kitchenUserName">John Doe</p>
-                        <p class="text-gray-600 dark:text-gray-400" id="kitchenUserDetails">House #12, Room 3</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="kitchenTime">10:30 AM</span></p>
+                        <p class="text-xl font-medium" id="kitchenUserName"></p>
+                        <p class="text-gray-600 dark:text-gray-400" id="kitchenUserDetails"></p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="kitchenTime"></span></p>
                     </div>
                     <button id="kitchenBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
                         Mark as In Use
@@ -214,7 +207,6 @@
             </div>
         </div>
 
-        <!-- User Modal -->
         <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
                 <div class="flex justify-between items-center mb-4">
@@ -223,7 +215,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <form id="userForm">
+                <div id="userForm">
                     <div class="mb-4">
                         <label for="name" class="block text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
                         <input type="text" id="name" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
@@ -236,14 +228,13 @@
                         <label for="roomNumber" class="block text-gray-700 dark:text-gray-300 mb-2">Room Number</label>
                         <input type="text" id="roomNumber" name="roomNumber" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                    <button id="saveUserBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
                         Save Information
                     </button>
-                </form>
+                </div>
             </div>
         </div>
 
-        <!-- Confirmation Modal -->
         <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
                 <div class="flex justify-between items-center mb-4">
@@ -266,156 +257,259 @@
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxO53ARV8CDYNFrs65NTKAnf6bFlbWpik",
+            authDomain: "utilityspacepembr.firebaseapp.com",
+            databaseURL: "https://utilityspacepembr-default-rtdb.firebaseio.com",
+            projectId: "utilityspacepembr",
+            storageBucket: "utilityspacepembr.firebasestorage.app",
+            messagingSenderId: "421678305752",
+            appId: "1:421678305752:web:cf9134ec23a7a048c3e2ad",
+            measurementId: "G-WM11W9FNVX"
+        };
+        let database;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+        let userInfo = null;
+        let currentSpace = null;
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for dark mode preference
-            if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.getElementById('darkModeToggle').checked = true;
-            }
+            console.log("DOM fully loaded");
 
             // Dark mode toggle
-            document.getElementById('darkModeToggle').addEventListener('change', function() {
-                if (this.checked) {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('darkMode', 'true');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('darkMode', 'false');
-                }
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (!darkModeToggle) {
+                console.error("Dark mode toggle not found");
+                return;
+            }
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+                darkModeToggle.checked = true;
+            }
+            darkModeToggle.addEventListener('change', function() {
+                document.documentElement.classList.toggle('dark', this.checked);
+                localStorage.setItem('darkMode', this.checked);
+                console.log("Dark mode toggled:", this.checked);
             });
 
-            // Check if user info exists in localStorage
-            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-            if (!userInfo) {
-                // Show modal if no user info exists
-                document.getElementById('userModal').classList.remove('hidden');
+            // User modal handling
+            const editUserBtn = document.getElementById('editUserBtn');
+            const userModal = document.getElementById('userModal');
+            const closeModal = document.getElementById('closeModal');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+
+            if (!editUserBtn || !userModal || !closeModal || !saveUserBtn) {
+                console.error("User modal elements missing");
+                return;
             }
 
-            // Modal handling
-            document.getElementById('editUserBtn').addEventListener('click', function() {
-                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            editUserBtn.addEventListener('click', function() {
                 if (userInfo) {
                     document.getElementById('name').value = userInfo.name;
                     document.getElementById('houseNumber').value = userInfo.houseNumber;
                     document.getElementById('roomNumber').value = userInfo.roomNumber;
                 }
-                document.getElementById('userModal').classList.remove('hidden');
+                userModal.classList.remove('hidden');
+                console.log("User modal opened");
             });
 
-            document.getElementById('closeModal').addEventListener('click', function() {
-                document.getElementById('userModal').classList.add('hidden');
+            closeModal.addEventListener('click', function() {
+                userModal.classList.add('hidden');
+                console.log("User modal closed");
             });
 
-            document.getElementById('userForm').addEventListener('submit', function(e) {
+            saveUserBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const name = document.getElementById('name').value;
                 const houseNumber = document.getElementById('houseNumber').value;
                 const roomNumber = document.getElementById('roomNumber').value;
-                
-                localStorage.setItem('userInfo', JSON.stringify({
-                    name,
-                    houseNumber,
-                    roomNumber
-                }));
-                
-                document.getElementById('userModal').classList.add('hidden');
+                if (!name || !houseNumber || !roomNumber) {
+                    console.error("User form fields incomplete");
+                    return;
+                }
+                userInfo = { name, houseNumber, roomNumber };
+                if (database) {
+                    database.ref('users/' + roomNumber).set(userInfo).then(() => {
+                        localStorage.setItem('roomNumber', roomNumber);
+                        userModal.classList.add('hidden');
+                        console.log("User info saved:", userInfo);
+                    }).catch(error => {
+                        console.error("Error saving user info:", error);
+                    });
+                } else {
+                    localStorage.setItem('roomNumber', roomNumber);
+                    userModal.classList.add('hidden');
+                    console.log("User info saved locally (no Firebase):", userInfo);
+                }
             });
 
-            // Load space status from localStorage
-            function loadSpaceStatus() {
-                const washerStatus = JSON.parse(localStorage.getItem('washerStatus'));
-                const dryerStatus = JSON.parse(localStorage.getItem('dryerStatus'));
-                const kitchenStatus = JSON.parse(localStorage.getItem('kitchenStatus'));
-
-                if (washerStatus && washerStatus.inUse) {
-                    showInUse('washer', washerStatus.user, washerStatus.time);
-                }
-
-                if (dryerStatus && dryerStatus.inUse) {
-                    showInUse('dryer', dryerStatus.user, dryerStatus.time);
-                }
-
-                if (kitchenStatus && kitchenStatus.inUse) {
-                    showInUse('kitchen', kitchenStatus.user, kitchenStatus.time);
-                }
+            // Load user info
+            const storedRoomNumber = localStorage.getItem('roomNumber');
+            if (storedRoomNumber && database) {
+                database.ref('users/' + storedRoomNumber).once('value').then(snapshot => {
+                    userInfo = snapshot.val();
+                    if (userInfo) {
+                        console.log("User info loaded:", userInfo);
+                    } else {
+                        console.log("No user data found, opening modal");
+                        userModal.classList.remove('hidden');
+                    }
+                }).catch(error => {
+                    console.error("Error loading user data:", error);
+                    userModal.classList.remove('hidden');
+                });
+            } else {
+                console.log("No stored room number, opening modal");
+                userModal.classList.remove('hidden');
             }
 
-            // Show space as in use
+            // Space status functions
             function showInUse(space, user, time) {
-                document.getElementById(`${space}Status`).classList.add('hidden');
-                document.getElementById(`${space}UserInfo`).classList.remove('hidden');
-                document.getElementById(`${space}Btn`).classList.add('hidden');
-                document.getElementById(`${space}FreeBtn`).classList.remove('hidden');
-                
+                const status = document.getElementById(`${space}Status`);
+                const userInfoDiv = document.getElementById(`${space}UserInfo`);
+                const btn = document.getElementById(`${space}Btn`);
+                const freeBtn = document.getElementById(`${space}FreeBtn`);
+                if (!status || !userInfoDiv || !btn || !freeBtn) {
+                    console.error(`Elements missing for ${space}`);
+                    return;
+                }
+                status.classList.add('hidden');
+                userInfoDiv.classList.remove('hidden');
+                btn.classList.add('hidden');
+                freeBtn.classList.remove('hidden');
                 document.getElementById(`${space}UserName`).textContent = user.name;
                 document.getElementById(`${space}UserDetails`).textContent = `House #${user.houseNumber}, Room ${user.roomNumber}`;
                 document.getElementById(`${space}Time`).textContent = formatTime(time);
+                console.log(`${space} marked as in use by ${user.name}`);
             }
 
-            // Format time
+            function showAvailable(space) {
+                const status = document.getElementById(`${space}Status`);
+                const userInfoDiv = document.getElementById(`${space}UserInfo`);
+                const btn = document.getElementById(`${space}Btn`);
+                const freeBtn = document.getElementById(`${space}FreeBtn`);
+                if (!status || !userInfoDiv || !btn || !freeBtn) {
+                    console.error(`Elements missing for ${space}`);
+                    return;
+                }
+                status.classList.remove('hidden');
+                userInfoDiv.classList.add('hidden');
+                btn.classList.remove('hidden');
+                freeBtn.classList.add('hidden');
+                console.log(`${space} marked as available`);
+            }
+
             function formatTime(timestamp) {
                 const date = new Date(timestamp);
-                let hours = date.getHours();
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12; // the hour '0' should be '12'
-                return `${hours}:${minutes} ${ampm}`;
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Load space status
+            function loadSpaceStatus() {
+                if (!database) {
+                    console.error("Database not initialized");
+                    return;
+                }
+                ['washer', 'dryer', 'kitchen'].forEach(space => {
+                    database.ref('spaces/' + space).on('value', snapshot => {
+                        console.log("Received update for", space, ":", snapshot.val());
+                        const data = snapshot.val();
+                        if (data && data.inUse) {
+                            showInUse(space, data.user, data.time);
+                        } else {
+                            showAvailable(space);
+                        }
+                    }, error => {
+                        console.error(`Error fetching ${space} status:`, error);
+                    });
+                });
             }
 
             // Button handlers
             function setupSpaceButton(space) {
                 const btn = document.getElementById(`${space}Btn`);
                 const freeBtn = document.getElementById(`${space}FreeBtn`);
-                
+                const confirmModal = document.getElementById('confirmModal');
+                const cancelConfirm = document.getElementById('cancelConfirm');
+                const closeConfirmModal = document.getElementById('closeConfirmModal');
+
+                if (!btn || !freeBtn || !confirmModal || !cancelConfirm || !closeConfirmModal) {
+                    console.error(`Button setup failed for ${space}: missing elements`);
+                    return;
+                }
+
                 btn.addEventListener('click', function() {
-                    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
                     if (!userInfo) {
-                        document.getElementById('userModal').classList.remove('hidden');
+                        userModal.classList.remove('hidden');
+                        console.log("User info required");
                         return;
                     }
-                    
-                    document.getElementById('confirmMessage').textContent = `Are you sure you want to mark the ${space.replace('-', ' ')} as in use?`;
-                    document.getElementById('confirmModal').classList.remove('hidden');
-                    
-                    document.getElementById('confirmAction').onclick = function() {
-                        const now = new Date();
-                        const status = {
-                            inUse: true,
-                            user: userInfo,
-                            time: now.getTime()
-                        };
-                        
-                        localStorage.setItem(`${space}Status`, JSON.stringify(status));
-                        showInUse(space, userInfo, now.getTime());
-                        document.getElementById('confirmModal').classList.add('hidden');
-                    };
+                    currentSpace = space;
+                    document.getElementById('confirmMessage').textContent = `Are you sure you want to mark the ${space} as in use?`;
+                    confirmModal.classList.remove('hidden');
+                    console.log("Confirmation modal opened for", space);
                 });
-                
+
                 freeBtn.addEventListener('click', function() {
-                    localStorage.removeItem(`${space}Status`);
-                    document.getElementById(`${space}Status`).classList.remove('hidden');
-                    document.getElementById(`${space}UserInfo`).classList.add('hidden');
-                    document.getElementById(`${space}Btn`).classList.remove('hidden');
-                    document.getElementById(`${space}FreeBtn`).classList.add('hidden');
+                    if (database) {
+                        database.ref('spaces/' + space).set({ inUse: false }).then(() => {
+                            console.log(`${space} marked as available`);
+                        }).catch(error => {
+                            console.error(`Error marking ${space} as available:`, error);
+                        });
+                    }
+                });
+
+                cancelConfirm.addEventListener('click', () => {
+                    confirmModal.classList.add('hidden');
+                    currentSpace = null;
+                    console.log("Confirmation cancelled");
+                });
+                closeConfirmModal.addEventListener('click', () => {
+                    confirmModal.classList.add('hidden');
+                    currentSpace = null;
+                    console.log("Confirmation modal closed");
                 });
             }
 
-            // Setup all space buttons
-            setupSpaceButton('washer');
-            setupSpaceButton('dryer');
-            setupSpaceButton('kitchen');
+            // Set up buttons for each space
+            ['washer', 'dryer', 'kitchen'].forEach(setupSpaceButton);
 
-            // Confirmation modal handling
-            document.getElementById('closeConfirmModal').addEventListener('click', function() {
-                document.getElementById('confirmModal').classList.add('hidden');
+            // Single event listener for confirm button
+            document.getElementById('confirmAction').addEventListener('click', function() {
+                if (!currentSpace) {
+                    console.error("No space selected");
+                    return;
+                }
+                if (!database) {
+                    console.error("Database not initialized");
+                    return;
+                }
+                if (!userInfo) {
+                    console.error("User info not set");
+                    return;
+                }
+                const now = Date.now();
+                console.log("Confirm button clicked, attempting to set", currentSpace, "to in use");
+                database.ref('spaces/' + currentSpace).set({
+                    inUse: true,
+                    user: userInfo,
+                    time: now
+                }).then(() => {
+                    console.log(currentSpace, "marked as in use successfully");
+                    document.getElementById('confirmModal').classList.add('hidden');
+                    currentSpace = null;
+                }).catch(error => {
+                    console.error("Error marking", currentSpace, "as in use:", error);
+                });
             });
 
-            document.getElementById('cancelConfirm').addEventListener('click', function() {
-                document.getElementById('confirmModal').classList.add('hidden');
-            });
-
-            // Load initial status
+            // Initialize space status listeners
             loadSpaceStatus();
         });
     </script>
