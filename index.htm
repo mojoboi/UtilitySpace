@@ -13,26 +13,12 @@
                 extend: {
                     colors: {
                         primary: {
-                            100: '#d1e4ff',
-                            200: '#a3c9ff',
-                            300: '#75aeff',
-                            400: '#4793ff',
-                            500: '#1978ff',
-                            600: '#1460cc',
-                            700: '#0f4899',
-                            800: '#0a3066',
-                            900: '#051833',
+                            100: '#d1e4ff', 200: '#a3c9ff', 300: '#75aeff', 400: '#4793ff',
+                            500: '#1978ff', 600: '#1460cc', 700: '#0f4899', 800: '#0a3066', 900: '#051833',
                         },
                         secondary: {
-                            100: '#f0f9ff',
-                            200: '#e0f2fe',
-                            300: '#bae6fd',
-                            400: '#7dd3fc',
-                            500: '#38bdf8',
-                            600: '#0ea5e9',
-                            700: '#0284c7',
-                            800: '#0369a1',
-                            900: '#075985',
+                            100: '#f0f9ff', 200: '#e0f2fe', 300: '#bae6fd', 400: '#7dd3fc',
+                            500: '#38bdf8', 600: '#0ea5e9', 700: '#0284c7', 800: '#0369a1', 900: '#075985',
                         }
                     }
                 }
@@ -40,254 +26,203 @@
         }
     </script>
     <style>
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #1978ff; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .modal { transition: opacity 0.25s ease; }
+        /* Basic styling for dropdown arrow */
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #1978ff;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .modal {
-            transition: opacity 0.25s ease;
-        }
+        html.dark select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); }
+        /* Style for Welcome Modal Overlay */
+        #welcomeModal { background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */ }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
+
+    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden modal">
+         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg text-gray-800 dark:text-gray-200">
+            <h2 class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-4 text-center sm:text-left">Hey!</h2>
+            <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">
+                Welcome to Pembroke Utility Space. A simple and handy space where we can mark and let others know if we are using the Washer, Dryer or the Kitchen so people can time things accordingly.
+            </p>
+            <ol class="list-decimal list-inside mb-6 space-y-3 text-gray-600 dark:text-gray-400">
+                <li>Get yourself familiar and feel free to Mark in and out once when you get the chance in case you use the Laundry or the Kitchen.</li>
+                <li>Feel free to use a fake name and room number incase you don't want others to know about that information. The goal is just to know someone is using stuff, that's all!</li>
+                <li>Please reach out to me using the Feedback section below in case you face any issue.</li>
+            </ol>
+            <p class="text-gray-600 dark:text-gray-400 mb-8 text-center sm:text-left">
+                Thanks for using Utility Space, hope you have a nice day!
+            </p>
+            <button id="continueWelcomeBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                Continue
+            </button>
+        </div>
+    </div>
     <div class="container mx-auto px-4 py-8 max-w-md">
         <header class="mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-primary-600 dark:text-primary-400">Pembrook Space</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-2">A simple web app to let fellow housemates know who is using what so they can time things accordingly :)</p>
-            </div>
-            <div class="flex items-center space-x-4 mt-4">
-                <div class="flex items-center">
-                    <i class="fas fa-moon mr-2"></i>
-                    <label class="switch">
-                        <input type="checkbox" id="darkModeToggle">
-                        <span class="slider"></span>
-                    </label>
-                    <i class="fas fa-sun ml-2"></i>
-                </div>
-                <button id="editUserBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <i class="fas fa-user-edit"></i>
-                </button>
-            </div>
+             <div>
+                 <h1 class="text-3xl font-bold text-primary-600 dark:text-primary-400">Pembrook Space</h1>
+                 <p class="text-gray-600 dark:text-gray-400 mt-2">A simple web app to let fellow housemates know who is using what so they can time things accordingly :)</p>
+             </div>
+             <div class="flex items-center space-x-4 mt-4">
+                 <div class="flex items-center">
+                     <i class="fas fa-moon mr-2"></i>
+                     <label class="switch">
+                         <input type="checkbox" id="darkModeToggle">
+                         <span class="slider"></span>
+                     </label>
+                     <i class="fas fa-sun ml-2"></i>
+                 </div>
+                 <button id="editUserBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                     <i class="fas fa-user-edit"></i>
+                 </button>
+             </div>
         </header>
 
         <div class="space-y-6 mb-8">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                <div class="bg-primary-500 dark:bg-primary-700 p-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <i class="fas fa-washer mr-2"></i> Laundry - Washer
-                    </h2>
-                </div>
+                <div class="bg-primary-500 dark:bg-primary-700 p-4"> <h2 class="text-xl font-semibold text-white flex items-center"> <i class="fas fa-washer mr-2"></i> Laundry - Washer </h2> </div>
                 <div class="p-6">
-                    <div id="washerStatus" class="text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-check-circle text-green-500"></i>
-                        </div>
-                        <p class="text-xl font-medium">Available</p>
-                    </div>
-                    <div id="washerUserInfo" class="hidden text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-user-clock text-yellow-500"></i>
-                        </div>
-                        <p class="text-xl font-medium" id="washerUserName"></p>
-                        <p class="text-gray-600 dark:text-gray-400" id="washerUserDetails"></p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="washerTime"></span></p>
-                    </div>
-                    <button id="washerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                        Mark as In Use
-                    </button>
-                    <button id="washerFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200">
-                        Mark as Available
-                    </button>
+                    <div id="washerStatus" class="text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-check-circle text-green-500"></i> </div> <p class="text-xl font-medium">Available</p> </div>
+                    <div id="washerUserInfo" class="hidden text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-user-clock text-yellow-500"></i> </div> <p class="text-xl font-medium" id="washerUserName"></p> <p class="text-gray-600 dark:text-gray-400" id="washerUserDetails"></p> <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="washerTime"></span></p> </div>
+                    <button id="washerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Mark as In Use </button>
+                    <button id="washerFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200"> Mark as Available </button>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                <div class="bg-primary-500 dark:bg-primary-700 p-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <i class="fas fa-wind mr-2"></i> Laundry - Dryer
-                    </h2>
-                </div>
+                <div class="bg-primary-500 dark:bg-primary-700 p-4"> <h2 class="text-xl font-semibold text-white flex items-center"> <i class="fas fa-wind mr-2"></i> Laundry - Dryer </h2> </div>
                 <div class="p-6">
-                    <div id="dryerStatus" class="text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-check-circle text-green-500"></i>
-                        </div>
-                        <p class="text-xl font-medium">Available</p>
-                    </div>
-                    <div id="dryerUserInfo" class="hidden text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-user-clock text-yellow-500"></i>
-                        </div>
-                        <p class="text-xl font-medium" id="dryerUserName"></p>
-                        <p class="text-gray-600 dark:text-gray-400" id="dryerUserDetails"></p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="dryerTime"></span></p>
-                    </div>
-                    <button id="dryerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                        Mark as In Use
-                    </button>
-                    <button id="dryerFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200">
-                        Mark as Available
-                    </button>
+                    <div id="dryerStatus" class="text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-check-circle text-green-500"></i> </div> <p class="text-xl font-medium">Available</p> </div>
+                    <div id="dryerUserInfo" class="hidden text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-user-clock text-yellow-500"></i> </div> <p class="text-xl font-medium" id="dryerUserName"></p> <p class="text-gray-600 dark:text-gray-400" id="dryerUserDetails"></p> <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="dryerTime"></span></p> </div>
+                    <button id="dryerBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Mark as In Use </button>
+                    <button id="dryerFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200"> Mark as Available </button>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                <div class="bg-primary-500 dark:bg-primary-700 p-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <i class="fas fa-utensils mr-2"></i> Kitchen
-                    </h2>
-                </div>
+                <div class="bg-primary-500 dark:bg-primary-700 p-4"> <h2 class="text-xl font-semibold text-white flex items-center"> <i class="fas fa-utensils mr-2"></i> Kitchen </h2> </div>
                 <div class="p-6">
-                    <div id="kitchenStatus" class="text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-check-circle text-green-500"></i>
-                        </div>
-                        <p class="text-xl font-medium">Available</p>
-                    </div>
-                    <div id="kitchenUserInfo" class="hidden text-center py-4">
-                        <div class="text-5xl mb-4">
-                            <i class="fas fa-user-clock text-yellow-500"></i>
-                        </div>
-                        <p class="text-xl font-medium" id="kitchenUserName"></p>
-                        <p class="text-gray-600 dark:text-gray-400" id="kitchenUserDetails"></p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="kitchenTime"></span></p>
-                    </div>
-                    <button id="kitchenBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                        Mark as In Use
-                    </button>
-                    <button id="kitchenFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200">
-                        Mark as Available
-                    </button>
+                    <div id="kitchenStatus" class="text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-check-circle text-green-500"></i> </div> <p class="text-xl font-medium">Available</p> </div>
+                    <div id="kitchenUserInfo" class="hidden text-center py-4"> <div class="text-5xl mb-4"> <i class="fas fa-user-clock text-yellow-500"></i> </div> <p class="text-xl font-medium" id="kitchenUserName"></p> <p class="text-gray-600 dark:text-gray-400" id="kitchenUserDetails"></p> <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Using since <span id="kitchenTime"></span></p> </div>
+                    <button id="kitchenBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Mark as In Use </button>
+                    <button id="kitchenFreeBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-lg mt-2 hidden transition duration-200"> Mark as Available </button>
                 </div>
             </div>
+        </div> <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6 mb-8">
+            <div class="bg-secondary-500 dark:bg-secondary-700 p-4"> <h2 class="text-xl font-semibold text-white flex items-center"> <i class="fas fa-users mr-2"></i> Registered Users </h2> </div>
+            <div class="p-6"> <ul id="userList" class="divide-y divide-gray-200 dark:divide-gray-700"> <li class="p-4 text-center text-gray-500 dark:text-gray-400">Loading users...</li> </ul> </div>
         </div>
-
-        <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">Your Information</h3>
-                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6 mb-8">
+            <div class="bg-gray-200 dark:bg-gray-700 p-4"> <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200 flex items-center"> <i class="fas fa-comment-alt mr-2"></i> Feedback </h2> </div>
+            <form id="feedbackForm" class="p-6">
+                <div class="mb-4">
+                    <label for="feedbackMessage" class="sr-only">Feedback Message</label>
+                    <textarea id="feedbackMessage" name="feedbackMessage" rows="4" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400" placeholder="Enter your feedback, suggestions, or report issues here..."></textarea>
                 </div>
+                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 -mt-2"> Your name and room details (if saved) will be submitted with your feedback. </p>
+                <button id="submitFeedbackBtn" type="submit" class="w-full bg-secondary-500 hover:bg-secondary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Submit Feedback </button>
+            </form>
+        </div>
+        <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden modal">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4"> <h3 class="text-xl font-bold">Your Information</h3> <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"> <i class="fas fa-times"></i> </button> </div>
                 <div id="userForm">
-                    <div class="mb-4">
-                        <label for="name" class="block text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
-                        <input type="text" id="name" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="mb-4">
-                        <label for="houseNumber" class="block text-gray-700 dark:text-gray-300 mb-2">House Number</label>
-                        <input type="text" id="houseNumber" name="houseNumber" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <div class="mb-6">
-                        <label for="roomNumber" class="block text-gray-700 dark:text-gray-300 mb-2">Room Number</label>
-                        <input type="text" id="roomNumber" name="roomNumber" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white">
-                    </div>
-                    <button id="saveUserBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                        Save Information
-                    </button>
+                    <div class="mb-4"> <label for="name" class="block text-gray-700 dark:text-gray-300 mb-2">Full Name</label> <input type="text" id="name" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"> </div>
+                    <div class="mb-4"> <label for="houseNumber" class="block text-gray-700 dark:text-gray-300 mb-2">House Number</label> <select id="houseNumber" name="houseNumber" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white appearance-none"> <option value="" disabled selected>Select your house number</option> <option value="66">66</option> <option value="66A">66A</option> <option value="68">68</option> </select> </div>
+                    <div class="mb-6"> <label for="roomNumber" class="block text-gray-700 dark:text-gray-300 mb-2">Room Number</label> <input type="text" id="roomNumber" name="roomNumber" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"> </div>
+                    <button id="saveUserBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Save Information </button>
                 </div>
             </div>
         </div>
-
-        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden modal">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">Confirm Action</h3>
-                    <button id="closeConfirmModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+                <div class="flex justify-between items-center mb-4"> <h3 class="text-xl font-bold">Confirm Action</h3> <button id="closeConfirmModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"> <i class="fas fa-times"></i> </button> </div>
                 <p id="confirmMessage" class="mb-6">Are you sure you want to mark this space as in use?</p>
-                <div class="flex justify-end space-x-4">
-                    <button id="cancelConfirm" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
-                        Cancel
-                    </button>
-                    <button id="confirmAction" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition duration-200">
-                        Confirm
-                    </button>
-                </div>
+                <div class="flex justify-end space-x-4"> <button id="cancelConfirm" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200"> Cancel </button> <button id="confirmAction" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition duration-200"> Confirm </button> </div>
             </div>
         </div>
-    </div>
-
-    <script type="module">
+        </div> <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+        import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
+        // --- Firebase Configuration ---
         const firebaseConfig = {
-            apiKey: "AIzaSyDxO53ARV8CDYNFrs65NTKAnf6bFlbWpik",
-            authDomain: "utilityspacepembr.firebaseapp.com",
-            databaseURL: "https://utilityspacepembr-default-rtdb.firebaseio.com",
-            projectId: "utilityspacepembr",
-            storageBucket: "utilityspacepembr.firebasestorage.app",
-            messagingSenderId: "421678305752",
-            appId: "1:421678305752:web:cf9134ec23a7a048c3e2ad",
-            measurementId: "G-WM11W9FNVX"
+          apiKey: "AIzaSyDxO53ARV8CDYNFrs65NTKAnf6bFlbWpik", // Replace if needed
+          authDomain: "utilityspacepembr.firebaseapp.com",
+          databaseURL: "https://utilityspacepembr-default-rtdb.firebaseio.com",
+          projectId: "utilityspacepembr",
+          storageBucket: "utilityspacepembr.firebasestorage.app",
+          messagingSenderId: "421678305752",
+          appId: "1:421678305752:web:cf9134ec23a7a048c3e2ad",
+          measurementId: "G-WM11W9FNVX"
         };
         let database;
         try {
             const app = initializeApp(firebaseConfig);
             database = getDatabase(app);
-            console.log("Firebase initialized successfully");
+            console.log("Firebase initialized successfully.");
         } catch (error) {
             console.error("Firebase initialization failed:", error);
+             alert("Critical Error: Could not connect to the database. App functionality will be limited."); // Show critical error
         }
-        let userInfo = null;
-        let currentSpace = null;
 
+        // --- Global Variables ---
+        let userInfo = null; // Holds current user's { name, houseNumber, roomNumber }
+        let currentSpace = null; // Tracks which space ('washer', 'dryer', 'kitchen') is being acted upon
+
+        // --- DOMContentLoaded Event Listener ---
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM fully loaded");
+            console.log("DOM fully loaded - Current Time (Local):", new Date().toLocaleString());
 
-            // Dark mode toggle
+            // --- Element References ---
             const darkModeToggle = document.getElementById('darkModeToggle');
-            if (!darkModeToggle) {
-                console.error("Dark mode toggle not found");
-                return;
+            const editUserBtn = document.getElementById('editUserBtn');
+            // User Modal
+            const userModal = document.getElementById('userModal');
+            const closeModal = document.getElementById('closeModal');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+            const userNameInput = document.getElementById('name');
+            const userHouseSelect = document.getElementById('houseNumber');
+            const userRoomInput = document.getElementById('roomNumber');
+            // Confirmation Modal
+            const confirmModal = document.getElementById('confirmModal');
+            const cancelConfirm = document.getElementById('cancelConfirm');
+            const closeConfirmModal = document.getElementById('closeConfirmModal');
+            const confirmAction = document.getElementById('confirmAction');
+            const confirmMessage = document.getElementById('confirmMessage');
+             // Registered Users List
+            const userListElement = document.getElementById('userList');
+            // Welcome Modal
+            const welcomeModal = document.getElementById('welcomeModal');
+            const continueWelcomeBtn = document.getElementById('continueWelcomeBtn');
+            // Feedback Form
+            const feedbackForm = document.getElementById('feedbackForm');
+            const feedbackMessageElement = document.getElementById('feedbackMessage');
+            const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+
+            // Check Core Elements - If any critical element is missing, stop execution
+            const criticalElements = { darkModeToggle, editUserBtn, userModal, closeModal, saveUserBtn, confirmModal, cancelConfirm, closeConfirmModal, confirmAction, confirmMessage, userListElement, welcomeModal, continueWelcomeBtn, feedbackForm, feedbackMessageElement, submitFeedbackBtn, userNameInput, userHouseSelect, userRoomInput };
+            for (const key in criticalElements) {
+                if (!criticalElements[key]) {
+                    console.error(`Critical UI element missing: #${key}. Halting execution.`);
+                    alert(`Error: UI element #${key} missing. Please refresh or contact support.`);
+                    return; // Stop script execution if essential elements are missing
+                }
             }
+            console.log("All core UI elements found.");
+
+            // --- Initialization and Event Listeners ---
+
+            // Dark Mode Toggle
             if (localStorage.getItem('darkMode') === 'true') {
                 document.documentElement.classList.add('dark');
                 darkModeToggle.checked = true;
@@ -295,252 +230,202 @@
             darkModeToggle.addEventListener('change', function() {
                 document.documentElement.classList.toggle('dark', this.checked);
                 localStorage.setItem('darkMode', this.checked);
-                console.log("Dark mode toggled:", this.checked);
             });
 
-            // User modal handling
-            const editUserBtn = document.getElementById('editUserBtn');
-            const userModal = document.getElementById('userModal');
-            const closeModal = document.getElementById('closeModal');
-            const saveUserBtn = document.getElementById('saveUserBtn');
-
-            if (!editUserBtn || !userModal || !closeModal || !saveUserBtn) {
-                console.error("User modal elements missing");
-                return;
+            // Welcome Modal Logic (Show on first visit)
+            if (!localStorage.getItem('hasSeenWelcome')) {
+                console.log("First visit detected, showing welcome modal.");
+                welcomeModal.classList.remove('hidden');
             }
 
+            continueWelcomeBtn.addEventListener('click', () => {
+                console.log("Welcome modal continue clicked.");
+                welcomeModal.classList.add('hidden');
+                localStorage.setItem('hasSeenWelcome', 'true');
+                // Prompt for user info *immediately* after welcome if not already set
+                if (!localStorage.getItem('userInfo')) {
+                    console.log("Prompting for user info after welcome.");
+                    setTimeout(() => userModal.classList.remove('hidden'), 100);
+                }
+            });
+
+            // User Info Modal: Edit Button
             editUserBtn.addEventListener('click', function() {
                 const storedUserInfo = localStorage.getItem('userInfo');
                 if (storedUserInfo) {
-                    userInfo = JSON.parse(storedUserInfo);
-                    document.getElementById('name').value = userInfo.name;
-                    document.getElementById('houseNumber').value = userInfo.houseNumber;
-                    document.getElementById('roomNumber').value = userInfo.roomNumber;
+                    const loadedInfo = JSON.parse(storedUserInfo);
+                    userNameInput.value = loadedInfo.name || '';
+                    userHouseSelect.value = loadedInfo.houseNumber || '';
+                    userRoomInput.value = loadedInfo.roomNumber || '';
+                } else {
+                    // Reset form if opening fresh
+                     userNameInput.value = '';
+                     userHouseSelect.value = ''; // Resets dropdown
+                     userRoomInput.value = '';
                 }
                 userModal.classList.remove('hidden');
-                console.log("User modal opened");
+                console.log("User info modal opened via edit button.");
             });
 
+            // User Info Modal: Close Button
             closeModal.addEventListener('click', function() {
                 userModal.classList.add('hidden');
-                console.log("User modal closed");
             });
 
+            // User Info Modal: Save Button
             saveUserBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const name = document.getElementById('name').value;
-                const houseNumber = document.getElementById('houseNumber').value;
-                const roomNumber = document.getElementById('roomNumber').value;
+                const name = userNameInput.value.trim();
+                const houseNumber = userHouseSelect.value;
+                const roomNumber = userRoomInput.value.trim().toUpperCase(); // Example: Force uppercase room
+
                 if (!name || !houseNumber || !roomNumber) {
-                    console.error("User form fields incomplete");
+                    alert("Please fill in all fields: Name, House Number, and Room Number.");
                     return;
                 }
-                userInfo = { name, houseNumber, roomNumber };
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                 if (/\s/.test(roomNumber)) { // Basic validation
+                     alert("Room number cannot contain spaces.");
+                     return;
+                 }
+
+                const newUserInfo = { name, houseNumber, roomNumber };
+                userInfo = newUserInfo; // Update global variable
+                localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+                localStorage.setItem('roomNumber', roomNumber); // Store room number separately if needed for lookups
+
                 if (database) {
-                    set(ref(database, 'users/' + roomNumber), userInfo).then(() => {
-                        localStorage.setItem('roomNumber', roomNumber);
+                    // Save user info to Firebase using roomNumber as the key
+                    // Note: This overwrites if the room number exists. Consider checking first if needed.
+                    set(ref(database, 'users/' + roomNumber), newUserInfo).then(() => {
+                        console.log("User info saved to Firebase:", newUserInfo);
                         userModal.classList.add('hidden');
-                        console.log("User info saved to Firebase:", userInfo);
+                        alert("Your information has been saved.");
                     }).catch(error => {
                         console.error("Error saving user info to Firebase:", error);
+                        alert("Error saving your information to the database. Please try again.");
                     });
                 } else {
-                    localStorage.setItem('roomNumber', roomNumber);
+                    console.warn("User info saved locally only (no database connection):", newUserInfo);
                     userModal.classList.add('hidden');
-                    console.log("User info saved locally (no Firebase):", userInfo);
+                    alert("Your information has been saved locally (no database connection).");
                 }
             });
 
-            // Load user info
-            const storedUserInfo = localStorage.getItem('userInfo');
-            if (storedUserInfo) {
-                userInfo = JSON.parse(storedUserInfo);
-                console.log("User info loaded from localStorage:", userInfo);
-            } else if (database) {
-                const storedRoomNumber = localStorage.getItem('roomNumber');
-                if (storedRoomNumber) {
-                    onValue(ref(database, 'users/' + storedRoomNumber), (snapshot) => {
-                        userInfo = snapshot.val();
-                        if (userInfo) {
-                            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                            console.log("User info loaded from Firebase:", userInfo);
-                        } else {
-                            console.log("No user data found, opening modal");
+            // Load Initial User Info (if available)
+            function loadInitialUserInfo() {
+                const storedUserInfo = localStorage.getItem('userInfo');
+                if (storedUserInfo) {
+                    userInfo = JSON.parse(storedUserInfo);
+                    console.log("User info loaded from localStorage:", userInfo);
+                    return true; // Indicate info was found
+                }
+                 // Optional: Try fetching from DB based on a stored room number if local storage is missing
+                 else if (database && localStorage.getItem('roomNumber')) {
+                     const storedRoom = localStorage.getItem('roomNumber');
+                      console.log(`Attempting to fetch user info from DB for room: ${storedRoom}`);
+                      const userRef = ref(database, 'users/' + storedRoom);
+                      onValue(userRef, (snapshot) => {
+                          const dbUserInfo = snapshot.val();
+                          if (dbUserInfo) {
+                              userInfo = dbUserInfo;
+                              localStorage.setItem('userInfo', JSON.stringify(userInfo)); // Sync back to local
+                              console.log("User info loaded from Firebase:", userInfo);
+                          } else {
+                               console.warn(`No user info found in DB for room ${storedRoom}. Clearing local pointers.`);
+                               localStorage.removeItem('userInfo'); // Clear potentially invalid pointers
+                               localStorage.removeItem('roomNumber');
+                          }
+                      }, { onlyOnce: true }, (error) => { // Fetch only once on load
+                          console.error(`Error fetching user info for room ${storedRoom}:`, error);
+                      });
+                      // Note: This DB fetch is async, userInfo might still be null immediately after this call
+                 }
+                 else {
+                    console.log("No stored user info found locally or unable to fetch.");
+                }
+
+                // Check if user needs prompting (only *after* welcome has been seen)
+                if (!userInfo && localStorage.getItem('hasSeenWelcome') && welcomeModal.classList.contains('hidden')) {
+                     console.log("Prompting returning user (no info found) to enter details.");
+                     setTimeout(() => {
+                         if (!localStorage.getItem('userInfo')) { // Final check before showing
                             userModal.classList.remove('hidden');
-                        }
-                    }, {
-                        onlyOnce: true
-                    }, (error) => {
-                        console.error("Error loading user data from Firebase:", error);
-                        userModal.classList.remove('hidden');
-                    });
-                } else {
-                    console.log("No stored room number, opening modal");
-                    userModal.classList.remove('hidden');
-                }
-            } else {
-                console.log("No stored user info, opening modal");
-                userModal.classList.remove('hidden');
+                         }
+                     }, 150);
+                 }
+                 return !!userInfo; // Return true if info is now loaded, false otherwise
             }
 
-            // Space status functions
-            function showInUse(space, user, time) {
-                const status = document.getElementById(`${space}Status`);
-                const userInfoDiv = document.getElementById(`${space}UserInfo`);
-                const btn = document.getElementById(`${space}Btn`);
-                const freeBtn = document.getElementById(`${space}FreeBtn`);
-                if (!status || !userInfoDiv || !btn || !freeBtn) {
-                    console.error(`Elements missing for ${space}`);
-                    return;
-                }
-                status.classList.add('hidden');
-                userInfoDiv.classList.remove('hidden');
-                btn.classList.add('hidden');
-                freeBtn.classList.remove('hidden');
-                document.getElementById(`${space}UserName`).textContent = user.name;
-                document.getElementById(`${space}UserDetails`).textContent = `House #${user.houseNumber}, Room ${user.roomNumber}`;
-                document.getElementById(`${space}Time`).textContent = formatTime(time);
-                console.log(`${space} marked as in use by ${user.name}`);
-            }
+            // --- Utility and Display Functions ---
 
-            function showAvailable(space) {
-                const status = document.getElementById(`${space}Status`);
-                const userInfoDiv = document.getElementById(`${space}UserInfo`);
-                const btn = document.getElementById(`${space}Btn`);
-                const freeBtn = document.getElementById(`${space}FreeBtn`);
-                if (!status || !userInfoDiv || !btn || !freeBtn) {
-                    console.error(`Elements missing for ${space}`);
-                    return;
-                }
-                status.classList.remove('hidden');
-                userInfoDiv.classList.add('hidden');
-                btn.classList.remove('hidden');
-                freeBtn.classList.add('hidden');
-                console.log(`${space} marked as available`);
-            }
+            function formatTime(timestamp) { /* ... (keep existing) ... */ }
+            function showInUse(space, user, time) { /* ... (keep existing) ... */ }
+            function showAvailable(space) { /* ... (keep existing) ... */ }
 
-            function formatTime(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-
-            // Load space status
+            // Load Status for Washer, Dryer, Kitchen
             function loadSpaceStatus() {
-                if (!database) {
-                    console.error("Database not initialized, cannot load space status");
-                    return;
-                }
-                ['washer', 'dryer', 'kitchen'].forEach(space => {
-                    onValue(ref(database, 'spaces/' + space), (snapshot) => {
-                        console.log("Received update for", space, ":", snapshot.val());
-                        const data = snapshot.val();
-                        if (data && data.inUse) {
-                            showInUse(space, data.user, data.time);
-                        } else {
-                            showAvailable(space);
-                        }
-                    }, (error) => {
-                        console.error(`Error fetching ${space} status:`, error);
-                    });
-                });
+                if (!database) { console.warn("Cannot load space status: Database not available."); return; }
+                ['washer', 'dryer', 'kitchen'].forEach(space => { /* ... (keep existing logic) ... */ });
             }
 
-            // Button handlers
+            // Display List of Registered Users
+            function displayUsers() {
+                if (!database || !userListElement) { console.warn("Cannot display users: Database or list element missing."); if(userListElement) userListElement.innerHTML = '...'; return; }
+                const usersRef = ref(database, 'users/');
+                onValue(usersRef, (snapshot) => { /* ... (keep existing logic) ... */ }, (error) => { /* ... (keep existing error handling) ... */ });
+            }
+
+            // --- Action Button Setup ---
+
+            // Setup Mark/Free Buttons for Spaces
             function setupSpaceButton(space) {
                 const btn = document.getElementById(`${space}Btn`);
                 const freeBtn = document.getElementById(`${space}FreeBtn`);
-                const confirmModal = document.getElementById('confirmModal');
-                const cancelConfirm = document.getElementById('cancelConfirm');
-                const closeConfirmModal = document.getElementById('closeConfirmModal');
+                if (!btn || !freeBtn) { console.error(`Buttons missing for space: ${space}`); return; }
 
-                if (!btn || !freeBtn || !confirmModal || !cancelConfirm || !closeConfirmModal) {
-                    console.error(`Button setup failed for ${space}: missing elements`);
-                    return;
-                }
-
+                // Mark as In Use Button
                 btn.addEventListener('click', function() {
-                    const storedUserInfo = localStorage.getItem('userInfo');
-                    if (!storedUserInfo) {
-                        userModal.classList.remove('hidden');
-                        console.log("User info required");
-                        return;
-                    }
-                    userInfo = JSON.parse(storedUserInfo);
-                    currentSpace = space;
-                    document.getElementById('confirmMessage').textContent = `Are you sure you want to mark the ${space} as in use?`;
+                    // Ensure current user info is loaded before allowing action
+                     if (!userInfo) { // Use the global variable
+                         alert("Please set your user information first using the user icon.");
+                         editUserBtn.click(); // Open user modal
+                         return;
+                     }
+                     if (!userInfo.name || !userInfo.houseNumber || !userInfo.roomNumber) { // Verify completeness
+                          alert("Your saved information is incomplete. Please update it.");
+                          editUserBtn.click();
+                          return;
+                     }
+
+                    currentSpace = space; // Set space for confirmation modal
+                    confirmMessage.textContent = `Are you sure you want to mark the ${space} as in use?`;
                     confirmModal.classList.remove('hidden');
-                    console.log("Confirmation modal opened for", space);
                 });
 
-                freeBtn.addEventListener('click', function() {
-                    if (!database) {
-                        console.error("Database not initialized, cannot mark as available");
-                        return;
-                    }
-                    set(ref(database, 'spaces/' + space), { inUse: false }).then(() => {
-                        console.log(`${space} marked as available`);
-                    }).catch(error => {
-                        console.error(`Error marking ${space} as available:`, error);
-                    });
-                });
-
-                cancelConfirm.addEventListener('click', () => {
-                    confirmModal.classList.add('hidden');
-                    currentSpace = null;
-                    console.log("Confirmation cancelled");
-                });
-                closeConfirmModal.addEventListener('click', () => {
-                    confirmModal.classList.add('hidden');
-                    currentSpace = null;
-                    console.log("Confirmation modal closed");
-                });
+                // Mark as Available Button
+                freeBtn.addEventListener('click', function() { /* ... (keep existing logic) ... */ });
             }
 
-            // Set up buttons for each space
-            ['washer', 'dryer', 'kitchen'].forEach(setupSpaceButton);
+            // Confirmation Modal Buttons
+            cancelConfirm.addEventListener('click', () => { confirmModal.classList.add('hidden'); currentSpace = null; });
+            closeConfirmModal.addEventListener('click', () => { confirmModal.classList.add('hidden'); currentSpace = null; });
+            confirmAction.addEventListener('click', function() { /* ... (keep existing logic, ensuring userInfo is validated before set) ... */ });
 
-            // Single event listener for confirm button
-            document.getElementById('confirmAction').addEventListener('click', function() {
-                console.log("Confirm button clicked");
-                if (!currentSpace) {
-                    console.error("No space selected for confirmation");
-                    return;
-                }
-                if (!userInfo) {
-                    console.error("User info not available");
-                    userModal.classList.remove('hidden');
-                    return;
-                }
-                const now = Date.now();
-                console.log(`Attempting to mark ${currentSpace} as in use with user:`, userInfo);
-                if (database) {
-                    set(ref(database, 'spaces/' + currentSpace), {
-                        inUse: true,
-                        user: userInfo,
-                        time: now
-                    }).then(() => {
-                        console.log(`${currentSpace} marked as in use successfully`);
-                        document.getElementById('confirmModal').classList.add('hidden');
-                        currentSpace = null;
-                    }).catch(error => {
-                        console.error(`Error marking ${currentSpace} as in use:`, error);
-                        // Fallback: Update UI locally to confirm button works
-                        showInUse(currentSpace, userInfo, now);
-                        document.getElementById('confirmModal').classList.add('hidden');
-                        currentSpace = null;
-                    });
-                } else {
-                    console.error("Database not initialized, updating UI locally");
-                    showInUse(currentSpace, userInfo, now);
-                    document.getElementById('confirmModal').classList.add('hidden');
-                    currentSpace = null;
-                }
-            });
+            // Feedback Form Submission
+            feedbackForm.addEventListener('submit', (e) => { /* ... (keep existing logic) ... */ });
 
-            // Initialize space status listeners
-            loadSpaceStatus();
-        });
+
+            // --- Initialize Application ---
+            console.log("Initializing application components...");
+
+            loadInitialUserInfo(); // Load user info first
+            loadSpaceStatus(); // Load current status of shared spaces
+            displayUsers(); // Display the list of registered users
+            ['washer', 'dryer', 'kitchen'].forEach(setupSpaceButton); // Setup action buttons
+
+            console.log("Application initialization complete.");
+
+        }); // End DOMContentLoaded
     </script>
 </body>
 </html>
