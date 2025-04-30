@@ -43,6 +43,25 @@ background-position: right 0.5rem center; background-repeat: no-repeat; backgrou
 html.dark select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); }
 /* Style for Welcome Modal Overlay */
 #welcomeModal { background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */ }
+
+/* Style for Confirmation Popup */
+#confirmation-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) ;
+    background-color: #28a745; /* Green */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000; /* Ensure it's on top */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+    pointer-events: none; /* Allow clicks to pass through */
+    font-size: 0.9rem;
+}
+
 </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
@@ -136,6 +155,15 @@ Continue
 <button id="submitFeedbackBtn" type="submit" class="w-full bg-secondary-500 hover:bg-secondary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200"> Submit Feedback </button>
 </form>
 </div>
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-6 mb-8">
+<div class="bg-gray-200 dark:bg-gray-700 p-4"> <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200 flex items-center"> <i class="fas fa-comments mr-2"></i> Your Feedback </h2> </div>
+<div class="p-6">
+    <ul id="userFeedbackList" class="divide-y divide-gray-200 dark:divide-gray-700">
+        <li class="p-4 text-center text-gray-500 dark:text-gray-400">Loading your feedback...</li>
+    </ul>
+</div>
+</div>
 <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden modal">
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md">
 <div class="flex justify-between items-center mb-4"> <h3 class="text-xl font-bold">Your Information</h3> <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"> <i class="fas fa-times"></i> </button> </div>
@@ -156,7 +184,7 @@ Continue
 </div>
 </div> <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getDatabase, ref, set, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js'; // Added 'remove'
+import { getDatabase, ref, set, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
@@ -221,9 +249,13 @@ const continueWelcomeBtn = document.getElementById('continueWelcomeBtn');
 const feedbackForm = document.getElementById('feedbackForm');
 const feedbackMessageElement = document.getElementById('feedbackMessage');
 const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+// Your Feedback List
+const userFeedbackListElement = document.getElementById('userFeedbackList');
+
 
 // Check Core Elements - If any critical element is missing, stop execution
-const criticalElements = { darkModeToggle, editUserBtn, userModal, closeModal, saveUserBtn, confirmModal, cancelConfirm, closeConfirmModal, confirmAction, confirmMessage, userListElement, welcomeModal, continueWelcomeBtn, feedbackForm, feedbackMessageElement, submitFeedbackBtn, userNameInput, userHouseSelect, userRoomInput };
+// Added userFeedbackListElement to critical checks
+const criticalElements = { darkModeToggle, editUserBtn, userModal, closeModal, saveUserBtn, confirmModal, cancelConfirm, closeConfirmModal, confirmAction, confirmMessage, userListElement, welcomeModal, continueWelcomeBtn, feedbackForm, feedbackMessageElement, submitFeedbackBtn, userNameInput, userHouseSelect, userRoomInput, userFeedbackListElement };
 for (const key in criticalElements) {
 if (!criticalElements[key]) {
 console.error(`Critical UI element missing: #${key}. Halting execution.`);
@@ -232,6 +264,262 @@ return; // Stop script execution if essential elements are missing
 }
 }
 console.log("All core UI elements found.");
+
+// --- Utility Functions ---
+
+// Function to show a temporary confirmation popup
+function showConfirmationPopup(message, duration = 3000) {
+    // Remove any existing popups first
+    const existingPopup = document.getElementById('confirmation-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    const popup = document.createElement('div');
+    popup.id = 'confirmation-popup';
+    popup.textContent = message;
+    Object.assign(popup.style, {
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#28a745', // Green background
+        color: 'white',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        zIndex: '1000', // Ensure it's on top
+        opacity: '0', // Start hidden for fade-in
+        transition: 'opacity 0.5s ease-in-out', // Fade transition
+        textAlign: 'center',
+        pointerEvents: 'none', // Allow clicks to pass through
+        fontSize: '0.9rem', // Smaller font size
+    });
+
+    document.body.appendChild(popup);
+
+    // Trigger fade-in
+    setTimeout(() => {
+        popup.style.opacity = '1';
+    }, 10); // Small delay to ensure transition works
+
+    // Hide and remove after duration
+    setTimeout(() => {
+        popup.style.opacity = '0'; // Start fade-out
+        setTimeout(() => {
+            popup.remove(); // Remove element after fade-out
+        }, 500); // Match transition duration
+    }, duration); // Duration before fade-out starts (e.g., 3000ms = 3 seconds)
+}
+
+
+function formatTime(timestamp) {
+// Check if timestamp is a valid number before creating Date object
+if (typeof timestamp !== 'number' || isNaN(timestamp)) {
+console.warn("Invalid timestamp received:", timestamp);
+return 'Invalid Time';
+}
+const date = new Date(timestamp);
+// Use toLocaleString for user-friendly time in local timezone
+return date.toLocaleString(undefined, {
+hour: 'numeric',
+minute: 'numeric',
+hour12: true, // Use 12-hour format with AM/PM
+day: 'numeric',
+month: 'short',
+year: 'numeric' // Added year for feedback timestamps
+});
+}
+
+// Updated function signature to accept the full status object
+function showInUse(space, status) {
+const statusEl = document.getElementById(`${space}Status`);
+const userInfoEl = document.getElementById(`${space}UserInfo`);
+const userNameEl = document.getElementById(`${space}UserName`);
+const userDetailsEl = document.getElementById(`${space}UserDetails`);
+const timeEl = document.getElementById(`${space}Time`);
+const btn = document.getElementById(`${space}Btn`);
+const freeBtn = document.getElementById(`${space}FreeBtn`);
+
+// Add checks if status or status.user are null/undefined
+const user = status ? status.user : null;
+const timestamp = status ? status.timestamp : null;
+
+
+if (statusEl) statusEl.classList.add('hidden');
+if (userInfoEl) userInfoEl.classList.remove('hidden');
+if (btn) btn.classList.add('hidden');
+if (freeBtn) freeBtn.classList.remove('hidden');
+
+// Access user details and timestamp from the 'status' object
+if (userNameEl) userNameEl.textContent = user && user.name ? user.name : 'Unnamed User';
+if (userDetailsEl) userDetailsEl.textContent = user ? `(House ${user.houseNumber || 'N/A'}, Room ${user.roomNumber || 'N/A'})` : '(Details N/A)';
+if (timeEl) timeEl.textContent = timestamp ? formatTime(timestamp) : 'Unknown Time';
+}
+
+function showAvailable(space) {
+const statusEl = document.getElementById(`${space}Status`);
+const userInfoEl = document.getElementById(`${space}UserInfo`);
+const btn = document.getElementById(`${space}Btn`);
+const freeBtn = document.getElementById(`${space}FreeBtn`);
+
+if (statusEl) statusEl.classList.remove('hidden');
+if (userInfoEl) userInfoEl.classList.add('hidden');
+if (btn) btn.classList.remove('hidden');
+if (freeBtn) freeBtn.classList.add('hidden');
+}
+
+
+// Load Status for Washer, Dryer, Kitchen
+function loadSpaceStatus() {
+if (!database) { console.warn("Cannot load space status: Database not available."); return; }
+['washer', 'dryer', 'kitchen'].forEach(space => {
+const spaceRef = ref(database, 'status/' + space);
+onValue(spaceRef, (snapshot) => {
+const statusData = snapshot.val();
+// Pass the entire statusData object to showInUse and check isInUse
+if (statusData && statusData.isInUse) {
+console.log(`${space} is in use. Data:`, statusData);
+showInUse(space, statusData);
+} else {
+console.log(`${space} is available.`);
+showAvailable(space);
+}
+}, (error) => {
+console.error(`Error fetching ${space} status:`, error);
+// Optionally display an error state for the specific space, e.g.:
+// const statusEl = document.getElementById(`${space}Status`);
+// if(statusEl) statusEl.innerHTML = '<p class="text-red-500">Error loading status.</p>';
+});
+});
+}
+
+// Display List of Registered Users
+function displayUsers() {
+if (!database || !userListElement) {
+console.warn("Cannot display users: Database not available or list element missing.");
+if(userListElement) userListElement.innerHTML = '<li class="p-4 text-center text-gray-500 dark:text-gray-400">Could not load users.</li>';
+return;
+}
+const usersRef = ref(database, 'users/');
+onValue(usersRef, (snapshot) => {
+const users = snapshot.val();
+userListElement.innerHTML = ''; // Clear current list (including 'Loading...')
+
+if (users) {
+const userKeys = Object.keys(users);
+if (userKeys.length > 0) {
+console.log("Displaying registered users:", users);
+userKeys.forEach(key => {
+const user = users[key];
+const listItem = document.createElement('li');
+listItem.className = 'p-4 flex justify-between items-center';
+listItem.innerHTML = `
+<div class="flex items-center">
+<i class="fas fa-user-circle text-primary-500 mr-3 text-xl"></i>
+<div>
+<p class="font-semibold">${user.name || 'Unnamed User'}</p>
+<p class="text-sm text-gray-600 dark:text-gray-400">House ${user.houseNumber || 'N/A'}, Room ${user.roomNumber || 'N/A'}</p>
+</div>
+</div>
+`; // Removed delete button
+userListElement.appendChild(listItem);
+});
+} else {
+// Display message when no users are registered
+console.log("No registered users found.");
+const listItem = document.createElement('li');
+listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
+listItem.textContent = 'No users registered yet.';
+userListElement.appendChild(listItem);
+}
+} else {
+// Display message when the 'users' node is null
+console.log("No users data found in database.");
+const listItem = document.createElement('li');
+listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
+listItem.textContent = 'No users registered yet.';
+userListElement.appendChild(listItem);
+}
+}, (error) => {
+console.error("Error fetching registered users:", error);
+userListElement.innerHTML = '<li class="p-4 text-center text-red-500">Error loading users.</li>'; // Display error state
+});
+}
+
+
+// Display current user's feedback
+function displayUserFeedback() {
+if (!database || !userFeedbackListElement) {
+console.warn("Cannot display user feedback: Database not available or list element missing.");
+if(userFeedbackListElement) userFeedbackListElement.innerHTML = '<li class="p-4 text-center text-gray-500 dark:text-gray-400">Could not load your feedback.</li>';
+return;
+}
+
+// Get current user's room number for filtering
+const currentUserRoom = userInfo ? (userInfo.roomNumber || '').toUpperCase() : null;
+
+const feedbackRef = ref(database, 'feedback/');
+onValue(feedbackRef, (snapshot) => {
+const allFeedback = snapshot.val();
+userFeedbackListElement.innerHTML = ''; // Clear current list (including 'Loading...')
+let userFeedbackFound = false;
+
+if (!currentUserRoom) {
+    // Display message if user info is not saved
+    const listItem = document.createElement('li');
+    listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
+    listItem.textContent = 'Please save your user information to see your feedback.';
+    userFeedbackListElement.appendChild(listItem);
+    console.log("User info not available, cannot display user feedback.");
+    return; // Exit function early if user info is missing
+}
+
+
+if (allFeedback) {
+console.log("Checking feedback for user room:", currentUserRoom, allFeedback);
+const feedbackKeys = Object.keys(allFeedback);
+// Sort feedback by timestamp descending (newest first)
+feedbackKeys.sort((a, b) => allFeedback[b].timestamp - allFeedback[a].timestamp);
+
+feedbackKeys.forEach(key => {
+const feedback = allFeedback[key];
+// Check if feedback entry has user info and matches current user's room number
+if (feedback.user && (feedback.user.roomNumber || '').toUpperCase() === currentUserRoom) {
+userFeedbackFound = true;
+const listItem = document.createElement('li');
+// Use items-start for alignment, include space-x-4 for gap between text and delete button
+listItem.className = 'p-4 flex justify-between items-start space-x-4';
+
+listItem.innerHTML = `
+<div class="flex-1 min-w-0">
+    <p class="font-semibold">${feedback.user.name || 'Your Feedback'}</p>
+    <p class="text-sm text-gray-600 dark:text-gray-400 break-words">${feedback.message || 'No message.'}</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${formatTime(feedback.timestamp)}</p>
+</div>
+`; // Removed delete button HTML here
+userFeedbackListElement.appendChild(listItem);
+}
+});
+
+// Removed delete button event listener delegation here
+
+}
+
+if (!userFeedbackFound && currentUserRoom) { // Only show "No feedback" if user info is saved
+// Display message if no feedback found for the current user
+const listItem = document.createElement('li');
+listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
+listItem.textContent = 'No feedback submitted by you yet.';
+userFeedbackListElement.appendChild(listItem);
+}
+
+}, (error) => {
+console.error("Error fetching user feedback:", error);
+userFeedbackListElement.innerHTML = '<li class="p-4 text-center text-red-500">Error loading your feedback.</li>'; // Display error state
+});
+}
+
+// Removed handleFeedbackDelete function
 
 // --- Initialization and Event Listeners ---
 
@@ -314,9 +602,11 @@ if (database) {
 set(ref(database, 'users/' + roomNumber), newUserInfo).then(() => {
 console.log("User info saved to Firebase:", newUserInfo);
 userModal.classList.add('hidden');
-alert("Your information has been saved.");
+showConfirmationPopup("Your information has been saved!"); // Popup on saving user info
 // Re-display users after saving potentially new/updated user
 displayUsers();
+// Also refresh user feedback display as user info might be new/updated
+displayUserFeedback();
 }).catch(error => {
 console.error("Error saving user info to Firebase:", error);
 alert("Error saving your information to the database. Please try again.");
@@ -340,126 +630,6 @@ console.log("No stored user info found in localStorage.");
 return false; // Indicate no info found
 }
 
-// --- Utility and Display Functions ---
-
-function formatTime(timestamp) {
-const date = new Date(timestamp);
-// Use toLocaleString for user-friendly time in local timezone
-return date.toLocaleString(undefined, {
-hour: 'numeric',
-minute: 'numeric',
-hour12: true, // Use 12-hour format with AM/PM
-day: 'numeric',
-month: 'short'
-});
-}
-
-function showInUse(space, user) {
-const statusEl = document.getElementById(`${space}Status`);
-const userInfoEl = document.getElementById(`${space}UserInfo`);
-const userNameEl = document.getElementById(`${space}UserName`);
-const userDetailsEl = document.getElementById(`${space}UserDetails`);
-const timeEl = document.getElementById(`${space}Time`);
-const btn = document.getElementById(`${space}Btn`);
-const freeBtn = document.getElementById(`${space}FreeBtn`);
-
-if (statusEl) statusEl.classList.add('hidden');
-if (userInfoEl) userInfoEl.classList.remove('hidden');
-if (btn) btn.classList.add('hidden');
-if (freeBtn) freeBtn.classList.remove('hidden');
-
-if (userNameEl) userNameEl.textContent = user.name || 'N/A';
-if (userDetailsEl) userDetailsEl.textContent = `(House ${user.houseNumber || 'N/A'}, Room ${user.roomNumber || 'N/A'})`;
-if (timeEl) timeEl.textContent = user.timestamp ? formatTime(user.timestamp) : 'Unknown Time';
-}
-
-function showAvailable(space) {
-const statusEl = document.getElementById(`${space}Status`);
-const userInfoEl = document.getElementById(`${space}UserInfo`);
-const btn = document.getElementById(`${space}Btn`);
-const freeBtn = document.getElementById(`${space}FreeBtn`);
-
-if (statusEl) statusEl.classList.remove('hidden');
-if (userInfoEl) userInfoEl.classList.add('hidden');
-if (btn) btn.classList.remove('hidden');
-if (freeBtn) freeBtn.classList.add('hidden');
-}
-
-
-// Load Status for Washer, Dryer, Kitchen
-function loadSpaceStatus() {
-if (!database) { console.warn("Cannot load space status: Database not available."); return; }
-['washer', 'dryer', 'kitchen'].forEach(space => {
-const spaceRef = ref(database, 'status/' + space);
-onValue(spaceRef, (snapshot) => {
-const statusData = snapshot.val();
-if (statusData && statusData.isInUse && statusData.user) {
-console.log(`${space} is in use by`, statusData.user);
-showInUse(space, statusData.user);
-} else {
-console.log(`${space} is available.`);
-showAvailable(space);
-}
-}, (error) => {
-console.error(`Error fetching ${space} status:`, error);
-// Optionally display an error state for the specific space
-});
-});
-}
-
-// Display List of Registered Users
-function displayUsers() {
-if (!database || !userListElement) {
-console.warn("Cannot display users: Database not available or list element missing.");
-if(userListElement) userListElement.innerHTML = '<li class="p-4 text-center text-gray-500 dark:text-gray-400">Could not load users.</li>';
-return;
-}
-const usersRef = ref(database, 'users/');
-onValue(usersRef, (snapshot) => {
-const users = snapshot.val();
-userListElement.innerHTML = ''; // Clear current list (including 'Loading...')
-
-if (users) {
-const userKeys = Object.keys(users);
-if (userKeys.length > 0) {
-console.log("Displaying registered users:", users);
-userKeys.forEach(key => {
-const user = users[key];
-const listItem = document.createElement('li');
-listItem.className = 'p-4 flex justify-between items-center';
-listItem.innerHTML = `
-<div class="flex items-center">
-<i class="fas fa-user-circle text-primary-500 mr-3 text-xl"></i>
-<div>
-<p class="font-semibold">${user.name || 'Unnamed User'}</p>
-<p class="text-sm text-gray-600 dark:text-gray-400">House ${user.houseNumber || 'N/A'}, Room ${user.roomNumber || 'N/A'}</p>
-</div>
-</div>
-`;
-userListElement.appendChild(listItem);
-});
-} else {
-// FIX: Display message when no users are registered
-console.log("No registered users found.");
-const listItem = document.createElement('li');
-listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
-listItem.textContent = 'No users registered yet.';
-userListElement.appendChild(listItem);
-}
-} else {
-// FIX: Display message when the 'users' node is null
-console.log("No users data found in database.");
-const listItem = document.createElement('li');
-listItem.className = 'p-4 text-center text-gray-500 dark:text-gray-400';
-listItem.textContent = 'No users registered yet.';
-userListElement.appendChild(listItem);
-}
-}, (error) => {
-console.error("Error fetching registered users:", error);
-userListElement.innerHTML = '<li class="p-4 text-center text-red-500">Error loading users.</li>'; // Display error state
-});
-}
-
 // --- Action Button Setup ---
 
 // Setup Mark/Free Buttons for Spaces
@@ -471,7 +641,6 @@ if (!btn || !freeBtn) { console.error(`Buttons missing for space: ${space}`); re
 // Mark as In Use Button
 btn.addEventListener('click', function() {
 // Ensure current user info is loaded and complete before allowing action
-// FIX: Added check for userInfo completeness
 if (!userInfo || !userInfo.name || !userInfo.houseNumber || !userInfo.roomNumber) {
 alert("Please set your complete user information first using the user icon.");
 editUserBtn.click(); // Open user modal to prompt for info
@@ -517,7 +686,6 @@ return;
 }
 
 // Ensure userInfo is available before proceeding with DB write
-// FIX: Added explicit check for userInfo before performing DB write
 if (!userInfo || !userInfo.name || !userInfo.houseNumber || !userInfo.roomNumber) {
 alert("Your user information is missing or incomplete. Please set it first.");
 currentSpace = null;
@@ -525,17 +693,28 @@ editUserBtn.click(); // Open user modal
 return;
 }
 
+// Add a check if currentSpace is unexpectedly null
+if (!currentSpace) {
+   console.error("currentSpace is null when trying to confirm action.");
+   alert("An internal error occurred. Please try again.");
+   return; // Prevent action if space is not identified
+}
+
+
 const spaceRef = ref(database, 'status/' + currentSpace);
 
 // Determine action based on which button was originally clicked (implicitly via currentSpace)
-const btn = document.getElementById(`${currentSpace}Btn`); // Check which button is currently visible/relevant
+const btn = document.getElementById(`${currentSpace}Btn`);
 const freeBtn = document.getElementById(`${currentSpace}FreeBtn`);
 
+// Rely on the free button visibility to determine if we are marking as available
 if (freeBtn && !freeBtn.classList.contains('hidden')) {
-// Action is to mark as available (Free button was visible)
+// Action is to mark as available
 console.log(`Confirming Mark Available for ${currentSpace}`);
 remove(spaceRef).then(() => {
 console.log(`${currentSpace} status removed (marked available).`);
+// FIX: Simple Success popup message
+showConfirmationPopup("Success");
 // UI update is handled by the onValue listener in loadSpaceStatus
 }).catch(error => {
 console.error(`Error marking ${currentSpace} available:`, error);
@@ -543,16 +722,18 @@ alert(`Error marking ${currentSpace} as available. Please try again.`);
 });
 
 } else if (btn && !btn.classList.contains('hidden')) {
-// Action is to mark as in use (Mark button was visible)
+// Action is to mark as in use
 console.log(`Confirming Mark In Use for ${currentSpace}`);
 const timestamp = Date.now();
 const statusData = {
 isInUse: true,
-user: userInfo, // Use the loaded/saved userInfo
-timestamp: timestamp
+user: userInfo, // Use the loaded/saved userInfo { name, houseNumber, roomNumber }
+timestamp: timestamp // Add the timestamp here
 };
 set(spaceRef, statusData).then(() => {
 console.log(`${currentSpace} status set to in use by`, userInfo);
+// FIX: Simple Success popup message
+showConfirmationPopup("Success");
 // UI update is handled by the onValue listener in loadSpaceStatus
 }).catch(error => {
 console.error(`Error marking ${currentSpace} in use:`, error);
@@ -581,7 +762,7 @@ alert("Please enter a feedback message.");
 return;
 }
 
-// FIX: Check if userInfo is available before submitting feedback
+// Check if userInfo is available before submitting feedback
 let feedbackData = {
 message: feedbackMessage,
 timestamp: Date.now()
@@ -599,16 +780,17 @@ alert("Your user information was not found or incomplete. Feedback submitted ano
 
 const feedbackRef = ref(database, 'feedback');
 push(feedbackRef, feedbackData).then(() => {
-alert("Feedback submitted successfully!");
-feedbackForm.reset(); // Clear the form
+    showConfirmationPopup("Feedback sent!"); // Show the custom popup
+    feedbackForm.reset(); // Clear the form
+    // The displayUserFeedback listener will automatically update the list
 }).catch(error => {
-console.error("Error submitting feedback:", error);
-alert("Error submitting feedback. Please try again.");
+    console.error("Error submitting feedback:", error);
+    alert("Error submitting feedback. Please try again."); // Keep alert for errors
 });
 });
 
 
-// --- Initialize Application ---
+// --- Initialization ---
 console.log("Initializing application components...");
 
 loadInitialUserInfo(); // Load user info from localStorage
@@ -631,9 +813,12 @@ userModal.classList.remove('hidden');
 if (database) {
 loadSpaceStatus(); // Load current status of shared spaces
 displayUsers(); // Display the list of registered users
+displayUserFeedback(); // Display the current user's feedback (without delete)
 } else {
 console.warn("Skipping database operations due to initialization failure.");
-// You might want to update UI elements to show a disconnected state
+// Update UI elements to show a disconnected state
+document.getElementById('userList').innerHTML = '<li class="p-4 text-center text-red-500">Cannot load users (Database connection failed).</li>';
+userFeedbackListElement.innerHTML = '<li class="p-4 text-center text-red-500">Cannot load your feedback (Database connection failed).</li>';
 }
 
 
